@@ -5,14 +5,16 @@ const asyncHandler = require('express-async-handler');
 // @route   POST /api/sessions
 // @access  Private
 const createSession = asyncHandler(async (req, res) => {
-  const { title, description, date, skillId } = req.body;
+  const { title, description, startTime, endTime, skillId, learnerId } = req.body;
 
   const session = await Session.create({
     title,
     description,
-    date,
+    startTime,
+    endTime,
     skill: skillId,
-    creator: req.user._id,
+    tutor: req.user._id,      // changed from creator → tutor
+    learner: learnerId,       // if you’re assigning the learner on creation
   });
 
   res.status(201).json(session);
@@ -22,7 +24,11 @@ const createSession = asyncHandler(async (req, res) => {
 // @route   GET /api/sessions
 // @access  Public
 const getSessions = asyncHandler(async (req, res) => {
-  const sessions = await Session.find().populate('creator', 'firstName lastName').populate('skill', 'name');
+  const sessions = await Session.find()
+    .populate('tutor', 'firstName lastName')     // changed from creator → tutor
+    .populate('learner', 'firstName lastName')
+    .populate('skill', 'name');
+
   res.json(sessions);
 });
 
@@ -30,7 +36,10 @@ const getSessions = asyncHandler(async (req, res) => {
 // @route   GET /api/sessions/:id
 // @access  Public
 const getSessionById = asyncHandler(async (req, res) => {
-  const session = await Session.findById(req.params.id).populate('creator', 'firstName lastName').populate('skill', 'name');
+  const session = await Session.findById(req.params.id)
+    .populate('tutor', 'firstName lastName')
+    .populate('learner', 'firstName lastName')
+    .populate('skill', 'name');
 
   if (session) {
     res.json(session);
@@ -49,7 +58,8 @@ const updateSession = asyncHandler(async (req, res) => {
   if (session) {
     session.title = req.body.title || session.title;
     session.description = req.body.description || session.description;
-    session.date = req.body.date || session.date;
+    session.startTime = req.body.startTime || session.startTime;
+    session.endTime = req.body.endTime || session.endTime;
 
     const updatedSession = await session.save();
     res.json(updatedSession);

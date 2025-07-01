@@ -5,23 +5,32 @@ const asyncHandler = require('express-async-handler');
 // @route   POST /api/ratings
 // @access  Private
 const createRating = asyncHandler(async (req, res) => {
-  const { sessionId, score, comment } = req.body;
+  const { sessionId, ratedUserId, rating, feedback } = req.body;
 
-  const rating = await Rating.create({
+  if (!sessionId || !ratedUserId || !rating) {
+    return res.status(400).json({ message: 'sessionId, ratedUserId, and rating are required' });
+  }
+
+  const newRating = await Rating.create({
     session: sessionId,
-    score,
-    comment,
-    user: req.user._id,
+    rated: ratedUserId,
+    rater: req.user._id,
+    rating,
+    feedback,
   });
 
-  res.status(201).json(rating);
+  res.status(201).json(newRating);
 });
 
 // @desc    Get all ratings
 // @route   GET /api/ratings
 // @access  Public
 const getRatings = asyncHandler(async (req, res) => {
-  const ratings = await Rating.find().populate('user', 'firstName lastName').populate('session', 'title');
+  const ratings = await Rating.find()
+    .populate('rater', 'firstName lastName')
+    .populate('rated', 'firstName lastName')
+    .populate('session', 'title');
+
   res.json(ratings);
 });
 
@@ -29,7 +38,9 @@ const getRatings = asyncHandler(async (req, res) => {
 // @route   GET /api/ratings/session/:sessionId
 // @access  Public
 const getRatingsBySession = asyncHandler(async (req, res) => {
-  const ratings = await Rating.find({ session: req.params.sessionId }).populate('user', 'firstName lastName');
+  const ratings = await Rating.find({ session: req.params.sessionId })
+    .populate('rater', 'firstName lastName')
+    .populate('rated', 'firstName lastName');
 
   res.json(ratings);
 });
@@ -41,8 +52,12 @@ const updateRating = asyncHandler(async (req, res) => {
   const rating = await Rating.findById(req.params.id);
 
   if (rating) {
-    rating.score = req.body.score || rating.score;
-    rating.comment = req.body.comment || rating.comment;
+    if (String(rating.rater) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized to update this rating' });
+    }
+
+    rating.rating = req.body.rating || rating.rating;
+    rating.feedback = req.body.feedback || rating.feedback;
 
     const updatedRating = await rating.save();
     res.json(updatedRating);
@@ -59,6 +74,10 @@ const deleteRating = asyncHandler(async (req, res) => {
   const rating = await Rating.findById(req.params.id);
 
   if (rating) {
+    if (String(rating.rater) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized to delete this rating' });
+    }
+
     await rating.remove();
     res.json({ message: 'Rating removed' });
   } else {
