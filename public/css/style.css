@@ -1,0 +1,29 @@
+:root {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.hero {
+  background-image: linear-gradient(to right, #eff6ff, #dbeafe);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}

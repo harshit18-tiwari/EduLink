@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Learning Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between">
+            <a href="/" class="text-xl font-bold">LearnTogether</a>
+            <div class="space-x-4">
+                <% if (currentUser) { %>
+                    <a href="/skills" class="hover:bg-blue-700 px-3 py-2 rounded">Skills</a>
+                    <a href="/help-requests" class="hover:bg-blue-700 px-3 py-2 rounded">Help Requests</a>
+                    <a href="/sessions" class="hover:bg-blue-700 px-3 py-2 rounded">Sessions</a>
+                    <a href="/logout" class="hover:bg-blue-700 px-3 py-2 rounded">Logout</a>
+                <% } else { %>
+                    <a href="/login" class="hover:bg-blue-700 px-3 py-2 rounded">Login</a>
+                    <a href="/register" class="hover:bg-blue-700 px-3 py-2 rounded">Register</a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
