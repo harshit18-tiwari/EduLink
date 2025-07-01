@@ -31,6 +31,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 connectDB();
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('Home Page'); 
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/skills', skillRoutes);
