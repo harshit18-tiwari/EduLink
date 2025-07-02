@@ -15,3 +15,5 @@ const connectDB = async () => {
 
 module.exports = connectDB;
 
+// # MONGODB_URI=mongodb://localhost:27017/student-learning-app
+
